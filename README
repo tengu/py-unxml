@@ -1,0 +1,25 @@
+
+* py-unxml: Parse xml into python object hierarchy. 
+  * Parsing end of XML::Simple for python.
+  * usage
+    >>> import unxml
+    >>> conf=unxml.parse(file('/etc/solr/conf/solrconfig.xml').read())
+    >>> conf.keys()
+    [u'config']
+    >>> conf['config'].keys()
+    [u'abortOnConfigurationError', u'updateHandler', u'jmx', u'highlighting', u'requestDispatcher', u'queryResponseWriter', u'mainIndex', u'indexDefaults', u'admin', u'dataDir', u'requestHandler', u'searchComponent', u'query']
+    >>> conf['config']['admin'].keys()
+    [u'defaultQuery']
+    >>> conf['config']['admin']['defaultQuery']
+    u'solr'
+    >>> 
+    * as a command, unxml dumps xml as a pretty json
+        $ python unxml.py /etc/solr/conf/solrconfig.xml
+        {
+            "config": {
+                "abortOnConfigurationError": "${solr.abortOnConfigurationError:true}", 
+                "updateHandler": {
+                    ":class": "solr.DirectUpdateHandler2"
+                }, 
+        ... 
+  * comes with a simple api for transforming the tree.
