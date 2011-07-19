@@ -211,3 +211,7 @@ def find_nodes(node, pred):
 if __name__=='__main__':
     import sys
     dump_json(sys.argv[1])
+
+# xx how to filter and selectively export?
+__all__=set(dir()).difference(['Parser'])
+
