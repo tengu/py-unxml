@@ -6,7 +6,7 @@ setup(
     py_modules = ["unxml"],
     scripts = ["unxml.py"],
     license = "LGPL",
-    description = "pack a set of files into a .deb file with minimal fuss.",
+    description = "Parse XML into python object hierarchy. Like perl's XML::Simple.",
     author = "karasuyamatengu",
     author_email = "karasuyamatengu@gmail.com",
     url = "https://github.com/tengu/unxml",
