@@ -40,7 +40,7 @@ def node_add_child(node, tag, attrs):
 
     child={ PARENT_KEY : node }
     for k,v in attrs.items():
-        child[':'+k]=v
+        child[':'+k]=v          # xx attr key prefix
 
     node.setdefault(tag, []).append(child)
     return child
@@ -199,7 +199,13 @@ def dump_json(xml_file, *transformers):
     import sys
     import json
 
-    xmlo=parse(file(xml_file).read(), *transformers)
+    # dwim arg
+    if xml_file=='-':
+        xml_file=sys.stdin
+    if isinstance(xml_file, basestring):
+        xml_file=file(xml_file)
+
+    xmlo=parse(xml_file.read(), *transformers)
     print json.dumps(xmlo, indent=4)
 
 def find_nodes(node, pred):
@@ -209,8 +215,15 @@ def find_nodes(node, pred):
     return sum([ node_find(c, pred) for c in unxml.node_children(node) ], [])
 
 if __name__=='__main__':
+
     import sys
-    dump_json(sys.argv[1])
+
+    try:
+        xml_file=sys.argv[1]
+    except IndexError:
+        print >>sys.stderr, "usage %s [xml_file|-]" % sys.argv[0]
+        sys.exit(1)
+    dump_json(xml_file)
 
 # xx how to filter and selectively export?
 __all__=set(dir()).difference(['Parser'])
