@@ -19,5 +19,6 @@ setup(
         ],
     long_description = """ Load xml into composition of Python objects, like Perl's XML::Simple. 
 Provides a simple interface for further simplifying the object hierarchy.
-"""
+""",
+    zip_safe=False,
     )

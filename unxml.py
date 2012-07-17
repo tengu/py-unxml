@@ -35,12 +35,15 @@ def node_children(node):
                  for k,v in node_children_items(node) ],
                [])
 
-def node_add_child(node, tag, attrs):
+def node_add_child(node, tag, attrs, attr_key=None):
     """ adds a new node to the node and returns the newly added node """
+
+    if not attr_key:
+        attr_key=lambda x: x
 
     child={ PARENT_KEY : node }
     for k,v in attrs.items():
-        child[':'+k]=v          # xx attr key prefix
+        child[attr_key(k)]=v          # xx attr key prefix
 
     node.setdefault(tag, []).append(child)
     return child
@@ -162,12 +165,14 @@ standard_transformations=[
 ####
 class Parser(xml.sax.handler.ContentHandler):
     """ sax handler to parse xml into object hierarchey """
-    def __init__(self):
+
+    def __init__(self, attr_key=None):
         self.cur={}
         self.root=self.cur
+        self.attr_key=attr_key
 
     def startElement(self, name, attrs):
-        self.cur=node_add_child(self.cur, name, attrs)
+        self.cur=node_add_child(self.cur, name, attrs, attr_key=self.attr_key)
 
     def endElement(self, name):
         self.cur=self.cur[PARENT_KEY]
@@ -183,18 +188,18 @@ class Parser(xml.sax.handler.ContentHandler):
         """ completion hook """
         pass
 
-def _parse(xmlstr, *transformers):
+def _parse(xmlstr, *transformers, **opts):
     """ parse xml into a raw object hierarchey. """
-    parser=Parser()
+    parser=Parser(**opts)
     xml.sax.parseString(xmlstr, parser)
     transform(parser.root, *transformers)
     return parser.root
 
-def parse(xmlstr, *transformers):
+def parse(xmlstr, *transformers, **opts):
     """ parse xml into a nice object hierarchey """
-    return _parse(xmlstr, *(standard_transformations + list(transformers)))
+    return _parse(xmlstr, *(standard_transformations + list(transformers)), **opts)
 
-def dump_json(xml_file, *transformers):
+def dump_json(xml_file, *transformers, **opts):
     """ a sample main that takes a path to an xml file and dumps it as json """
     import sys
     import json
@@ -205,7 +210,7 @@ def dump_json(xml_file, *transformers):
     if isinstance(xml_file, basestring):
         xml_file=file(xml_file)
 
-    xmlo=parse(xml_file.read(), *transformers)
+    xmlo=parse(xml_file.read(), *transformers, **opts)
     print json.dumps(xmlo, indent=4)
 
 def find_nodes(node, pred):
@@ -223,7 +228,7 @@ if __name__=='__main__':
     except IndexError:
         print >>sys.stderr, "usage %s [xml_file|-]" % sys.argv[0]
         sys.exit(1)
-    dump_json(xml_file)
+    dump_json(xml_file, attr_key=lambda x: x)
 
 # xx how to filter and selectively export?
 __all__=set(dir()).difference(['Parser'])
